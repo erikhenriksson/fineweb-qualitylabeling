@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=fw-registers
+#SBATCH --job-name=fw-quality
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:mi250:8
 #SBATCH --ntasks=8

@@ -17,7 +17,6 @@ torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
 
 def process_chunk(chunk, model, tokenizer, platt_scaler, target_class_index=8):
     text_batch = [item["text"] for item in chunk]
-    text_ids = [item["id"] for item in chunk]
 
     all_lines_with_idx = []
     for doc_idx, text in enumerate(text_batch):
@@ -107,13 +106,14 @@ def main(args):
     )
     platt_scaler = joblib.load(scaler_path)
     model.to(device)
-    model = torch.compile(
-        model,
-        mode="reduce-overhead",
-        fullgraph=True,
-        dynamic=True,
-        backend="inductor",
-    )
+    # model = torch.compile(
+    #    model,
+    #    mode="reduce-overhead",
+    #    fullgraph=True,
+    #    dynamic=True,
+    #    backend="inductor",
+    # )
+    model.half()
     model.eval()
 
     total_items = 0
