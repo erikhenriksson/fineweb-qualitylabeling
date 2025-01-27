@@ -24,19 +24,15 @@ def process_chunk(chunk, model, tokenizer, platt_scaler, target_class_index=8):
         for line_idx, line in enumerate(text.splitlines()):
             all_lines_with_idx.append((len(line.split()), doc_idx, line_idx, line))
 
-    # Sort lines by their length (number of words) for efficient padding
+    # Sort lines by their length for efficient padding
     all_lines_with_idx.sort(key=lambda x: x[0])
 
     # Process each group of lines by length
-    all_scaled_probs = [None] * len(
-        all_lines_with_idx
-    )  # Pre-allocate space for results
+    all_scaled_probs = [None] * len(all_lines_with_idx)
     for i in range(0, len(all_lines_with_idx), 128):
-        # Extract a batch of lines with their metadata
         batch = all_lines_with_idx[i : i + 128]
-        line_batch = [x[3] for x in batch]  # Get the actual text lines
+        line_batch = [x[3] for x in batch]
 
-        # Tokenize the batch of lines with padding based on the longest line in the batch
         inputs = tokenizer(
             line_batch,
             return_tensors="pt",
@@ -47,15 +43,11 @@ def process_chunk(chunk, model, tokenizer, platt_scaler, target_class_index=8):
 
         with torch.no_grad():
             outputs = model(**inputs)
-            logits = outputs.logits.cpu().numpy()  # Move logits to CPU
+            logits = outputs.logits.cpu().numpy()
 
-        # Extract logits for the target class
         positive_logits = logits[:, target_class_index]
-
-        # Apply Platt scaling on the logits
         scaled_probs = platt_scaler.predict_proba(positive_logits.reshape(-1, 1))[:, 1]
 
-        # Store the scaled probabilities in the original order
         for j, (_, doc_idx, line_idx, _) in enumerate(batch):
             all_scaled_probs[i + j] = (doc_idx, line_idx, round(scaled_probs[j], 4))
 
@@ -64,10 +56,16 @@ def process_chunk(chunk, model, tokenizer, platt_scaler, target_class_index=8):
     for doc_idx, line_idx, prob in sorted(all_scaled_probs, key=lambda x: (x[0], x[1])):
         doc_scaled_probs[doc_idx].append(prob)
 
-    # Add IDs back and return
+    # Create results while preserving ALL original data
     results = []
-    for doc_idx, doc_id in enumerate(text_ids):
-        results.append({"id": doc_id, "line_quality": doc_scaled_probs[doc_idx]})
+    for doc_idx, original_doc in enumerate(chunk):
+        # Create a new dict with all original data
+        augmented_doc = original_doc.copy()
+        # Add our new field
+        augmented_doc["line_quality"] = doc_scaled_probs[doc_idx]
+        results.append(augmented_doc)
+
+    return results
 
 
 def process_large_file(input_file, chunk_size):
@@ -90,7 +88,7 @@ def process_large_file(input_file, chunk_size):
 
 
 def write_incremental_parquet(results, output_file, first_write=False):
-    """Write results incrementally to parquet file."""
+    """Write results incrementally to parquet file, preserving all data types."""
     df = pd.DataFrame(results)
 
     if first_write:
@@ -125,7 +123,7 @@ def main(args):
     for chunk_idx, chunk in enumerate(process_large_file(args.input_file, 10000)):
         start_time = time.perf_counter()
 
-        results = process_chunk(chunk, tokenizer, model, platt_scaler)
+        results = process_chunk(chunk, model, tokenizer, platt_scaler)
 
         # Write results immediately instead of storing them
         write_incremental_parquet(results, args.output_file, first_write)
