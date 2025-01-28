@@ -6,7 +6,7 @@
 #SBATCH --ntasks=8
 #SBATCH --mem=128G
 #SBATCH --cpus-per-task=4
-#SBATCH --time=12:00:00
+#SBATCH --time=00:00:15
 #SBATCH --output=slurm-logs/%j.out
 #SBATCH --error=slurm-logs/%j.err
 #SBATCH --account=project_462000642

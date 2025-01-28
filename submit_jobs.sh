@@ -17,12 +17,19 @@ fi
 
 SUBSET="$1"
 
-# Conditional logic for PARQUET_DIR based on SUBSET
+# Add debug statements
+echo "SUBSET is: $SUBSET"
+echo "Testing condition..."
+
 if [[ "$SUBSET" == "100BT" || "$SUBSET" == "350BT" || "$SUBSET" == "10BT" ]]; then
+    echo "Condition matched! Should use SAMPLE_DIR"
     PARQUET_DIR="$ROOT_DIR/$SAMPLE_DIR/$SUBSET"
 else
+    echo "Condition did not match. Using DATA_DIR"
     PARQUET_DIR="$ROOT_DIR/$DATA_DIR/$SUBSET"
 fi
+
+echo "PARQUET_DIR is: $PARQUET_DIR"
 
 PREDICT_DIR="$ROOT_DIR/$PREDICT_DIR/$SUBSET"
 LOG_DIR="$ROOT_DIR/$LOG_DIR/$SUBSET"
