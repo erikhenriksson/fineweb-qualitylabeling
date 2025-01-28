@@ -23,7 +23,12 @@ module load pytorch/2.4
 SCRIPT_DIR="$3"
 source "$SCRIPT_DIR/common.sh"
 SUBSET="$1"
-PARQUET_DIR="$ROOT_DIR/$DATA_DIR/$SUBSET"
+# Add the same conditional logic here
+if [[ "$SUBSET" == "100BT" || "$SUBSET" == "350BT" || "$SUBSET" == "10BT" ]]; then
+    PARQUET_DIR="$ROOT_DIR/$SAMPLE_DIR/$SUBSET"
+else
+    PARQUET_DIR="$ROOT_DIR/$DATA_DIR/$SUBSET"
+fi
 PREDICT_DIR="$ROOT_DIR/$PREDICT_DIR/$SUBSET"
 LOG_DIR="$ROOT_DIR/$LOG_DIR/$SUBSET"
 
