@@ -23,16 +23,15 @@ echo "Testing condition..."
 
 if [[ "$SUBSET" == "100BT" || "$SUBSET" == "350BT" || "$SUBSET" == "10BT" ]]; then
     echo "Condition matched! Should use SAMPLE_DIR"
-    PARQUET_DIR="$ROOT_DIR/$SAMPLE_DIR/$SUBSET"
-else
-    echo "Condition did not match. Using DATA_DIR"
-    PARQUET_DIR="$ROOT_DIR/$DATA_DIR/$SUBSET"
+    DATA_DIR=$SAMPLE_DIR
 fi
+
+PARQUET_DIR="$ROOT_DIR/$DATA_DIR/$SUBSET"
 
 echo "PARQUET_DIR is: $PARQUET_DIR"
 
-PREDICT_DIR="$ROOT_DIR/$PREDICT_DIR/$SUBSET"
-LOG_DIR="$ROOT_DIR/$LOG_DIR/$SUBSET"
+PREDICT_DIR="$ROOT_DIR/$PREDICT_DIR/$DATA_DIR/$SUBSET"
+LOG_DIR="$ROOT_DIR/$LOG_DIR/$DATA_DIR/$SUBSET"
 
 # Check if directory exists
 if [ ! -d "$PARQUET_DIR" ]; then
