@@ -3,7 +3,7 @@ from huggingface_hub import snapshot_download
 from pathlib import Path
 
 
-def download_cc_dump(dump_name: str, local_dir: str = "./fineweb") -> str:
+def download_cc_dump(dump_name: str, local_dir: str = "../FINEWEB") -> str:
     """
     Download a specific Common Crawl dump from the FineWeb dataset.
 
@@ -33,8 +33,8 @@ def main():
     parser.add_argument("dump_name", help="Name of the dump (e.g., CC-MAIN-2024-18)")
     parser.add_argument(
         "--local-dir",
-        default="../../FINEWEB",
-        help="Local directory to store the dump (default: ../../FINEWEB)",
+        default="../FINEWEB",
+        help="Local directory to store the dump (default: ../FINEWEB)",
     )
 
     args = parser.parse_args()

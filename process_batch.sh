@@ -9,7 +9,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --output=slurm-logs/%j.out
 #SBATCH --error=slurm-logs/%j.err
-#SBATCH --account=project_462000642
+#SBATCH --account=project_462000615
 #SBATCH --partition=small-g
 
 #SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
